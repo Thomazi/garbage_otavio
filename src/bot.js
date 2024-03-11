@@ -8,29 +8,32 @@ const bot = new TelegramBot(token, {polling: true});
 
 // Matches "/echo [whatever]"
 bot.onText(/\/echo (.+)/, (msg, match) => {
-  // 'msg' is the received Message from Telegram
-  // 'match' is the result of executing the regexp above on the text content
-  // of the message
-
   const chatId = msg.chat.id;
   const resp = match[1]; // the captured "whatever"
 
-  // send back the matched "whatever" to the chat
+
   bot.sendMessage(chatId, resp);
   bot.sendMessage(msg.chat.id, "Welcome");
 });
 
-// Listen for any kind of message. There are different kinds of
-// messages.
-bot.on('message', (msg) => {
-    var hi = "hi";
-    if (msg.text.toString().toLowerCase().indexOf(hi) === 0) {
-    bot.sendMessage(msg.chat.id,"Hello dear user");
-    }
-    
-    var bye = "bye";
-    if (msg.text.toString().toLowerCase().includes(bye)) {
-    bot.sendMessage(msg.chat.id, "Hope to see you around again , Bye");
-    }
+
+bot.on('photo', async (msg) => {
+    const chatId = msg.chat.id;
+    const lastPhotoId = msg.photo[msg.photo.length - 1].file_id;
+
+    const photo = await bot.downloadFile(lastPhotoId, './src/img');
+    const photoURL = await bot.getFileLink(lastPhotoId);
+
+    bot.sendPhoto(chatId, photo, {caption: photoURL});
 });
+
+bot.on('document', async (msg) => {
+    const chatId = msg.chat.chatId
+    const fileId = msg.document.file_id;
+    const document = await bot.downloadFile(fileId, "./src/img");
+
+    bot.sendPhoto(chat.Id, document);
+  
+});
+
 
